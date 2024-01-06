@@ -1,25 +1,44 @@
-import logo from './logo.svg';
+import React, {Component} from 'react';
 import './App.css';
+import Form from './Components/Form';
+import Repos from './Components/Repos';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+   
+  state = {
+    repoName: "",
+    error: ""
+  }
+
+  
+
+  getRepos = async (e) => {
+    e.preventDefault();
+    const repoName = e.target.elements.user.value;
+    const api = await fetch(`https://api.github.com/users/${repoName}/repos`);
+    const data = await api.json();
+    console.log(data)
+    if(repoName){
+      this.setState({
+        repoName: data.map((item) => {return(item.name)}),
+        error: ""
+      })
+   } else {
+      this.setState({
+        repoName: "",
+        error: "Please Write Github Username"
+      })
+    }
+  }
+  render(){
+    return (
+      <div className="App">
+         <Form getRepos = {this.getRepos}/>
+         <Repos repoName = {this.state.repoName} error = {this.state.error}/>
+      </div>
+    );
+  }
+  
 }
 
 export default App;
